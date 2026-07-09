@@ -1,0 +1,60 @@
+body {
+    margin: 0;
+    background: black;
+    overflow: hidden;
+}
+#lirik {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    top: 40px;
+    color: cyan;
+    font-size: 30px;
+    font-weight: bold;
+    text-shadow: 0 0 10px cyan;
+    z-index: 10;
+}
+
+/* KOD BARU UNTUK HP BAR */
+.hp-box {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    color: white;
+    font-weight: bold;
+    width: 200px;
+    z-index: 20; /* Paling atas sekali */
+}
+.hp2 {
+    left: auto;
+    right: 10px; /* Kanan */
+}
+.hp-bar {
+    width: 200px;
+    height: 20px;
+    background: #333;
+    border: 2px solid white;
+    border-radius: 5px;
+    margin-top: 5px;
+}
+.hp-fill {
+    width: 100%;
+    height: 100%;
+    background: red;
+    border-radius: 3px;
+}
+
+#game {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+}
+#char {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 200px;
+    z-index: 5;
+}

@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>KAWAN.GG</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #0a0b14;
+    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+    color: #fff;
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+  }
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image: repeating-linear-gradient(90deg, rgba(120,130,200,0.08) 0 2px, transparent 2px 40px);
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  /* ============ AUTH PAGE (Log Masuk / Daftar) ============ */
+  #authPage {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 24px 16px;
+    position: relative;
+    z-index: 1;
+  }
+  .card {
+    position: relative;
+    width: 100%;
+    max-width: 420px;
+    background: rgba(18, 20, 32, 0.9);
+    border: 1px solid rgba(120,130,200,0.25);
+    border-radius: 24px;
+    padding: 28px 24px;
+  }
+  .card::after {
+    content: "";
+    position: absolute;
+    top: 0; right: 0;
+    width: 40px; height: 40px;
+    background: linear-gradient(135deg, transparent 50%, rgba(97,218,251,0.5) 50%);
+    border-radius: 0 24px 0 0;
+  }
+  .tabs {
+    display: flex;
+    background: rgba(10,11,20,0.6);
+    border-radius: 14px;
+    padding: 4px;
+    margin-bottom: 28px;
+  }
+  .tab {
+    flex: 1;
+    text-align: center;
+    padding: 12px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 15px;
+    color: #9297ad;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+  }
+  .tab.active { background: linear-gradient(90deg, #61dafb, #7c3aed); color: #0a0b14; }
+  h1 { font-size: 26px; font-weight: 800; margin-bottom: 8px; }
+  .subtitle { color: #9297ad; font-size: 14px; margin-bottom: 24px; line-height: 1.5; }
+  label { display: block; font-size: 13px; color: #9297ad; margin-bottom: 6px; margin-top: 16px; }
+  input[type="text"], input[type="email"], input[type="password"] {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 12px;
+    border: 1px solid rgba(120,130,200,0.3);
+    background: rgba(10,11,20,0.6);
+    color: #fff;
+    font-size: 15px;
+    outline: none;
+  }
+  input:focus { border-color: #61dafb; }
+  input::placeholder { color: #565b73; }
+  .row-between { display: flex; align-items: center; justify-content: space-between; margin-top: 14px; font-size: 13px; }
+  .checkbox-wrap { display: flex; align-items: center; gap: 8px; color: #9297ad; }
+  .checkbox-wrap input { width: 16px; height: 16px; }
+  .link { color: #4ade90; text-decoration: none; font-weight: 600; }
+  .btn-submit {
+    width: 100%;
+    margin-top: 22px;
+    padding: 15px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(90deg, #61dafb, #7c3aed);
+    color: #0a0b14;
+    font-weight: 800;
+    font-size: 15px;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+  }
+  .btn-submit:disabled { opacity: 0.6; }
+  .switch-text { text-align: center; margin-top: 20px; font-size: 14px; color: #9297ad; }
+  .error-msg {
+    margin-top: 14px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    background: rgba(255,80,80,0.12);
+    border: 1px solid rgba(255,80,80,0.3);
+    color: #ff8080;
+    font-size: 13px;
+    display: none;
+  }
+  .form-section { display: none; }
+  .form-section.active { display: block; }
+
+  /* ============ DASHBOARD PAGE (Ruang Utama) ============ */
+  #dashboardPage {
+    display: none;
+    position: relative;
+    z-index: 1;
+  }
+  .wrap { max-width: 480px; margin: 0 auto; padding: 20px 20px 60px; }
+  header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(120,130,200,0.15);
+    margin-bottom: 32px;
+  }
+  .logo { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 18px; }
+  .logo-icon { width: 30px; height: 30px; border-radius: 8px; background: linear-gradient(135deg, #61dafb, #7c3aed); }
+  .btn-logout {
+    padding: 9px 16px; border-radius: 10px;
+    border: 1px solid rgba(120,130,200,0.3);
+    background: transparent; color: #9297ad;
+    font-size: 13px; font-weight: 600; cursor: pointer;
+  }
+  .status-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 14px; border-radius: 999px;
+    background: rgba(97, 218, 251, 0.1);
+    border: 1px solid rgba(97, 218, 251, 0.35);
+    color: #61dafb; font-size: 11px; font-weight: 700;
+    letter-spacing: 1px; margin-bottom: 24px;
+  }
+  .profile-row { display: flex; align-items: center; gap: 16px; margin-bottom: 8px; }
+  .avatar {
+    width: 68px; height: 68px; border-radius: 18px;
+    background: linear-gradient(135deg, #7c3aed, #61dafb);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 30px; font-weight: 800; flex-shrink: 0;
+  }
+  .welcome { font-size: 24px; font-weight: 800; line-height: 1.3; }
+  .welcome .username { color: #61dafb; }
+  .email { color: #9297ad; font-size: 14px; margin-top: 4px; margin-left: 84px; }
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 32px 0 28px; }
+  .stat-card {
+    background: rgba(18,20,32,0.85);
+    border: 1px solid rgba(120,130,200,0.2);
+    border-radius: 16px; padding: 16px 10px; text-align: center;
+  }
+  .stat-label { font-size: 10px; letter-spacing: 1px; color: #9297ad; text-transform: uppercase; margin-bottom: 8px; }
+  .stat-value { font-size: 16px; font-weight: 800; }
+  .stat-value.active-status { color: #4ade80; }
+  .btn-play {
+    width: 100%; padding: 18px; border: none; border-radius: 16px;
+    background: linear-gradient(90deg, #61dafb, #7c3aed);
+    color: #0a0b14; font-weight: 800; font-size: 16px;
+    letter-spacing: 0.5px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+  }
+  .file-note { text-align: center; font-size: 12px; color: #565b73; margin-top: 14px; line-height: 1.6; }
+  .file-note code { color: #61dafb; background: rgba(97,218,251,0.08); padding: 2px 6px; border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<!-- ======================= AUTH PAGE ======================= -->
+<div id="authPage">
+  <div class="card">
+    <div class="tabs">
+      <button class="tab active" id="tabLogin" onclick="switchTab('login')">Log Masuk</button>
+      <button class="tab" id="tabRegister" onclick="switchTab('register')">Daftar</button>
+    </div>
+
+    <div class="form-section active" id="loginSection">
+      <h1>Selamat kembali</h1>
+      <p class="subtitle">Log masuk untuk sambung sesi korang.</p>
+
+      <label>E-mel atau nama pengguna</label>
+      <input type="email" id="loginEmail" placeholder="you@email.com" />
+
+      <label>Kata laluan</label>
+      <input type="password" id="loginPassword" placeholder="••••••••" />
+
+      <div class="row-between">
+        <label class="checkbox-wrap" style="margin:0;">
+          <input type="checkbox" id="rememberMe" /> Ingat saya
+        </label>
+        <a href="#" class="link" onclick="forgotPassword(event)">Lupa kata laluan?</a>
+      </div>
+
+      <button class="btn-submit" id="loginBtn" onclick="doLogin()">LOG MASUK</button>
+      <div class="error-msg" id="loginError"></div>
+
+      <p class="switch-text">Tiada akaun lagi? <a href="#" class="link" onclick="switchTab('register')">Daftar sekarang</a></p>
+    </div>
+
+    <div class="form-section" id="registerSection">
+      <h1>Cipta akaun</h1>
+      <p class="subtitle">Daftar untuk mula main dan simpan progress korang.</p>
+
+      <label>Nama pengguna</label>
+      <input type="text" id="regUsername" placeholder="nama_korang" />
+
+      <label>E-mel</label>
+      <input type="email" id="regEmail" placeholder="you@email.com" />
+
+      <label>Kata laluan</label>
+      <input type="password" id="regPassword" placeholder="Minimum 6 aksara" />
+
+      <button class="btn-submit" id="registerBtn" onclick="doRegister()">DAFTAR</button>
+      <div class="error-msg" id="registerError"></div>
+
+      <p class="switch-text">Dah ada akaun? <a href="#" class="link" onclick="switchTab('login')">Log masuk</a></p>
+    </div>
+  </div>
+</div>
+
+<!-- ======================= DASHBOARD PAGE ======================= -->
+<div id="dashboardPage">
+  <div class="wrap">
+    <header>
+      <div class="logo">
+        <div class="logo-icon"></div>
+        KAWAN.GG
+      </div>
+      <button class="btn-logout" onclick="doLogout()">Log Keluar</button>
+    </header>
+
+    <span class="status-badge">SEDANG LOG MASUK</span>
+
+    <div class="profile-row">
+      <div class="avatar" id="avatarLetter">N</div>
+      <div class="welcome">Selamat datang, <span class="username" id="usernameText">...</span>!</div>
+    </div>
+    <div class="email" id="emailText">...</div>
+
+    <div class="stats">
+      <div class="stat-card">
+        <div class="stat-label">Ahli Sejak</div>
+        <div class="stat-value" id="memberSince">-</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Status</div>
+        <div class="stat-value active-status">Aktif</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Game Dimain</div>
+        <div class="stat-value" id="gamesPlayed">0</div>
+      </div>
+    </div>
+
+    <button class="btn-play" onclick="window.location.href='storm-pixel-rpg.html'">
+      ▶ MAIN GAME — STORM
+    </button>
+    <p class="file-note">
+      Fail <code>storm-pixel-rpg.html</code> kena diupload sekali dengan fail ni.
+    </p>
+<!-- ============================================
+  KAWAN.GG - "Coming Soon" Game Card + Pre-Register
+  Letak snippet ni bawah butang "MAIN GAME — STORM"
+  Tema: dark bg + gradient teal→purple, sama macam card sedia ada
+============================================ -->
+
+<style>
+  .kg-comingsoon-card {
+    position: relative;
+    margin-top: 20px;
+    padding: 20px;
+    border-radius: 20px;
+    background: rgba(20, 22, 34, 0.85);
+    border: 1px solid rgba(120, 130, 200, 0.25);
+    overflow: hidden;
+    font-family: inherit;
+  }
+
+  .kg-comingsoon-card::before {
+    content: "";
+    position: absolute;
+    top: -40%;
+    right: -20%;
+    width: 220px;
+    height: 220px;
+    background: radial-gradient(circle, rgba(97,218,251,0.25), transparent 70%);
+    pointer-events: none;
+  }
+
+  .kg-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: rgba(97, 218, 251, 0.12);
+    border: 1px solid rgba(97, 218, 251, 0.4);
+    color: #61dafb;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  .kg-badge .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #61dafb;
+    animation: kg-pulse 1.4s ease-in-out infinite;
+  }
+
+  @keyframes kg-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(1.4); }
+  }
+
+  .kg-game-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #7c3aed, #61dafb);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    margin-top: 14px;
+    box-shadow: 0 6px 18px rgba(124, 58, 237, 0.35);
+  }
+
+  .kg-title {
+    color: #f1f1f5;
+    font-size: 20px;
+    font-weight: 800;
+    margin-top: 12px;
+  }
+
+  .kg-sub {
+    color: #9297ad;
+    font-size: 13px;
+    margin-top: 4px;
+    line-height: 1.5;
+  }
+
+  .kg-form {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+  }
+
+  .kg-input {
+    flex: 1;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(120,130,200,0.3);
+    background: rgba(10,11,20,0.6);
+    color: #fff;
+    font-size: 14px;
+    outline: none;
+  }
+  .kg-input::placeholder { color: #6b7086; }
+  .kg-input:focus { border-color: #61dafb; }
+
+  .kg-btn {
+    padding: 12px 18px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(90deg, #61dafb, #7c3aed);
+    color: #0a0b14;
+    font-weight: 800;
+    font-size: 14px;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+  }
+  .kg-btn:active { transform: scale(0.96); }
+  .kg-btn:disabled { opacity: 0.6; }
+
+  .kg-count {
+    margin-top: 10px;
+    font-size: 12px;
+    color: #61dafb;
+  }
+
+  .kg-msg {
+    margin-top: 10px;
+    font-size: 13px;
+    color: #4ade80;
+    display: none;
+  }
+</style>
+
+<div class="kg-comingsoon-card">
+  <span class="kg-badge"><span class="dot"></span> Coming Soon</span>
+
+  <div class="kg-game-icon">🎮</div>
+  <div class="kg-title">Game Seterusnya</div>
+  <div class="kg-sub">Sedang dalam pembinaan guna pixel-engine.js. Daftar awal untuk dapat akses pertama bila launch!</div>
+
+  <form class="kg-form" id="kgPreregisterForm">
+    <input type="email" class="kg-input" id="kgEmailInput" placeholder="Email korang" required />
+    <button type="submit" class="kg-btn" id="kgSubmitBtn">Pre-Register</button>
+  </form>
+
+  <div class="kg-count" id="kgCount">0 orang dah pre-register</div>
+  <div class="kg-msg" id="kgMsg">✅ Terima kasih! Korang dah dalam list.</div>
+</div>
+
+<script>
+  // Ganti bahagian ni dengan Firebase Firestore korang punya
+  // (memandangkan Firebase Auth dah ada, senang je sambung ke Firestore collection "preregisters")
+  let kgCount = 0;
+  const kgCountEl = document.getElementById('kgCount');
+  const kgForm = document.getElementById('kgPreregisterForm');
+  const kgBtn = document.getElementById('kgSubmitBtn');
+  const kgMsg = document.getElementById('kgMsg');
+
+  kgCountEl.textContent = kgCount + ' orang dah pre-register';
+
+  kgForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    const email = document.getElementById('kgEmailInput').value.trim();
+    if (!email) return;
+
+    kgBtn.disabled = true;
+    kgBtn.textContent = 'Menghantar...';
+
+    // TODO: hantar email ni ke Firestore, contoh:
+    // await addDoc(collection(db, "preregisters"), { email, createdAt: serverTimestamp() });
+
+    setTimeout(function () {
+      kgCount++;
+      kgCountEl.textContent = kgCount + ' orang dah pre-register';
+      kgMsg.style.display = 'block';
+      kgForm.reset();
+      kgBtn.disabled = false;
+      kgBtn.textContent = 'Pre-Register';
+    }, 600);
+  });
+</script>
+
+    
+  </div>
+</div>
+
+<!-- ======================= FIREBASE ======================= -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script>
+  // ============================================
+  // FIREBASE CONFIG - Isi balik dari Firebase Console:
+  // Project Settings > General > "Your apps" > SDK config
+  // ============================================
+  const firebaseConfig = {
+    apiKey: "GANTI_DENGAN_API_KEY_KORANG",
+    authDomain: "GANTI.firebaseapp.com",
+    projectId: "GANTI_PROJECT_ID",
+    storageBucket: "GANTI.appspot.com",
+    messagingSenderId: "GANTI_SENDER_ID",
+    appId: "GANTI_APP_ID"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+
+  // ============================================
+  // AUTH PAGE LOGIC
+  // ============================================
+  function switchTab(tab) {
+    document.getElementById('tabLogin').classList.toggle('active', tab === 'login');
+    document.getElementById('tabRegister').classList.toggle('active', tab === 'register');
+    document.getElementById('loginSection').classList.toggle('active', tab === 'login');
+    document.getElementById('registerSection').classList.toggle('active', tab === 'register');
+  }
+
+  function showError(elId, message) {
+    const el = document.getElementById(elId);
+    el.textContent = message;
+    el.style.display = 'block';
+  }
+  function hideError(elId) {
+    document.getElementById(elId).style.display = 'none';
+  }
+
+  function doLogin() {
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    const btn = document.getElementById('loginBtn');
+    hideError('loginError');
+
+    if (!email || !password) {
+      showError('loginError', 'Sila isi e-mel dan kata laluan.');
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Sedang log masuk...';
+
+    const persistence = document.getElementById('rememberMe').checked
+      ? firebase.auth.Auth.Persistence.LOCAL
+      : firebase.auth.Auth.Persistence.SESSION;
+
+    auth.setPersistence(persistence)
+      .then(() => auth.signInWithEmailAndPassword(email, password))
+      .catch((err) => {
+        showError('loginError', terjemahError(err.code));
+        btn.disabled = false;
+        btn.textContent = 'LOG MASUK';
+      });
+  }
+
+  function doRegister() {
+    const username = document.getElementById('regUsername').value.trim();
+    const email = document.getElementById('regEmail').value.trim();
+    const password = document.getElementById('regPassword').value;
+    const btn = document.getElementById('registerBtn');
+    hideError('registerError');
+
+    if (!username || !email || !password) {
+      showError('registerError', 'Sila isi semua ruangan.');
+      return;
+    }
+    if (password.length < 6) {
+      showError('registerError', 'Kata laluan mesti sekurang-kurangnya 6 aksara.');
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Sedang daftar...';
+
+    auth.createUserWithEmailAndPassword(email, password)
+      .then((cred) => cred.user.updateProfile({ displayName: username }))
+      .catch((err) => {
+        showError('registerError', terjemahError(err.code));
+        btn.disabled = false;
+        btn.textContent = 'DAFTAR';
+      });
+  }
+
+  function forgotPassword(e) {
+    e.preventDefault();
+    const email = prompt('Masukkan e-mel akaun korang untuk terima pautan reset password:');
+    if (!email) return;
+
+    auth.sendPasswordResetEmail(email)
+      .then(() => alert('Emel reset password dah dihantar. Sila check inbox korang.'))
+      .catch((err) => alert('Ralat: ' + terjemahError(err.code)));
+  }
+
+  function terjemahError(code) {
+    const errors = {
+      'auth/invalid-email': 'Format e-mel tak sah.',
+      'auth/user-not-found': 'Akaun tak wujud.',
+      'auth/wrong-password': 'Kata laluan salah.',
+      'auth/email-already-in-use': 'E-mel ni dah didaftarkan.',
+      'auth/weak-password': 'Kata laluan terlalu lemah.',
+      'auth/invalid-credential': 'E-mel atau kata laluan salah.',
+      'auth/too-many-requests': 'Terlalu banyak cubaan. Cuba lagi sekejap.'
+    };
+    return errors[code] || 'Ralat berlaku. Cuba lagi.';
+  }
+
+  // ============================================
+  // DASHBOARD PAGE LOGIC
+  // ============================================
+  function doLogout() {
+    auth.signOut();
+  }
+
+  // ============================================
+  // ROUTER: tukar antara Auth Page <-> Dashboard Page
+  // ikut status log masuk, tanpa reload/tukar fail
+  // ============================================
+  auth.onAuthStateChanged((user) => {
+    const authPage = document.getElementById('authPage');
+    const dashboardPage = document.getElementById('dashboardPage');
+
+    if (user) {
+      authPage.style.display = 'none';
+      dashboardPage.style.display = 'block';
+
+      const name = user.displayName || user.email.split('@')[0];
+      document.getElementById('usernameText').textContent = name;
+      document.getElementById('avatarLetter').textContent = name.charAt(0).toUpperCase();
+      document.getElementById('emailText').textContent = user.email;
+
+      const created = new Date(user.metadata.creationTime);
+      const bulan = ['Jan','Feb','Mac','Apr','Mei','Jun','Jul','Ogo','Sep','Okt','Nov','Dis'];
+      document.getElementById('memberSince').textContent =
+        created.getDate() + ' ' + bulan[created.getMonth()] + ' ' + created.getFullYear();
+
+      // TODO: sambung ke Firestore untuk papar bilangan game dimain sebenar
+    } else {
+      dashboardPage.style.display = 'none';
+      authPage.style.display = 'flex';
+    }
+  });
+</script>
+
+</body>
+</html>
