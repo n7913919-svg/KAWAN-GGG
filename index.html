@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>STORM GAME</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="dashboard">
+
+    <h1>STORM MODE ON</h1>
+    <p>Pilih Fighter Kau!</p>
+
+    <div class="pilih-character">
+        
+        <div class="card">
+            <img src="assets/char1.png">
+            <h3>BADAI PINK</h3>
+            <button onclick="startGame()">PILIH</button>
+        </div>
+
+        <div class="card">
+            <img src="assets/char2.png">
+            <h3>BADAI COKLAT</h3>
+            <button onclick="startGame()">PILIH</button>
+        </div>
+
+    </div>
+
+    <script>
+        function startGame() {
+            window.location.href = "game/storm-web.html";
+        }
+    </script>
+
+</body>
+</html>
